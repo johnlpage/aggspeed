@@ -1,0 +1,59 @@
+db.prescriptions.aggregate([ { "$group" : {"_id": "$practice", 
+                                          "perpatient": {"$sum": {"$divide": [{"$sum": "$prescriptions.cost"}, 
+                                                                       "$numpatients"]}}}},
+                                        {"$sort":{"perpatient":-1}},
+                                        {"$limit":5}])
+
+
+db.prescriptions.aggregate([{"$group" : {          "_id" : { "county": "$address.county", "practice": "$practice"},
+	                                             "spend" : { "$sum" : {"$sum" : "$prescriptions.cost"}},
+	                                       "numpatients" : { "$avg" : "$numpatients"}}},
+	                        { "$group": { "_id" : "$_id.county", "spend" : { "$sum" : "$spend" },
+	                                                                         "numpatients" : {"$sum": "$numpatients"}}},
+	                                   {"$addFields" : { "costperpatient" : { "$divide" : ["$spend","$numpatients"] }}},
+	                                   {"$match" : { "numpatients" : { "$gt" : 100000}}},
+	                                   {"$sort" : { "costperpatient" : -1}},
+	                                   {"$limit":20} ])
+
+
+
+
+db.prescriptions.aggregate([
+{ "$group" : { "_id" : "$prescriptions.bnfcode",
+"name" : { "$max":"$prescriptions.name"},
+"items" : {"$sum" : "$prescriptions.nitems"}  }},
+{"$sort" : { "items" : -1}},
+{"$limit":10}],{"allowDiskUse":true})
+
+
+//First comput the typical number prescribed per patient
+db.prescriptions.aggregate([
+{"$unwind" : "$prescriptions"},
+{"$group" : { "_id" : "$prescriptions.bnfcode", "aveperperson" : { "$avg" : {"$divide" : [ "$prescriptions.nitems","$numpatients"]}}}},
+{"$match" : { "aveperperson" : { "$ne" : null}}},
+{"$out":"typical"}
+])
+
+
+
+
+
+
+db.prescriptions.aggregate([ 
+	                         {"$match" : { "numpatients" :{"$gt" : 500},"actice" : {"$nin" : ["Y01924"]} }},
+	                         {"$unwind" : "$prescriptions"},
+							 {"$group" :  { "_id" : {"bnfcode":"$prescriptions.bnfcode","practice":"$practice"},
+							                "name" : {"$max":"$prescriptions.name"},
+							                "pracicename" : {"$max":"$address.name"},
+							            	"nitems" : { "$sum" : "$prescriptions.nitems"},
+							                "numpatients" : { "$max" : "$numpatients"},
+							                "nmonths" : { "$sum" : 1}
+							                }},
+							 {"$addFields" : { "perpatient" : {"$divide" : [{"$divide" : [ "$nitems","$nmonths" ]},"$numpatients"]}}},
+							 
+							 {"$lookup" : { "from" : "typical", "localField" : "_id.bnfcode", "foreignField" : "_id", "as" : "typical"}},
+							 {"$unwind" :  "$typical" },
+							 {"$addFields" : { "ratio" : {"$divide" : [ "$perpatient", "$typical.aveperperson" ]}}},
+							 {"$sort" : {"ratio":-1}},
+							 {"$limit":10}
+							 ],{"allowDiskUse":true})

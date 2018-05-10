@@ -1,0 +1,63 @@
+{
+
+"start": {
+  "template": {
+      "practice": "$practice",
+      "period": "$period",
+      "numpatients" : "@counts",
+      "address":"@practice",
+      "auth" : "@pct",
+      "prescriptions":["@prescriptions"]
+    },
+    "source": {
+        "uri":  "jdbc:mysql://localhost:3306/nhs?useUnicode=true&useServerPrepStmts=true&useSSL=false",
+        "user": "root",
+        "password": "password",
+    },
+    "target" : {
+      "mode": "insert",
+      "uri": "mongodb://MacPro.local:27017/",
+      "namespace": "nhs.presriptions"
+    },
+  "query": { "sql": "SELECT distinct practice,period FROM prescriptions"}
+},
+pct : { 
+  "template" : { "pct" : "$pct", "sha":"$sha"},
+  "params" : ["practice"],
+  "query": { "sql": "SELECT sha,pct from prescriptions where practice=? limit 1"}
+},
+
+
+"counts" : {
+  "template" : { "_value" : "$numpatients"},
+  "params" : ["practice"],
+  "query": { "sql": "SELECT numpatients from patientcounts where code=?"}
+},
+
+
+"prescriptions" : {
+  "template" : {"sha":"$sha",
+               "pct":"$pct",
+               "bnfcode":"$bnfcode",
+               "name":"$name",
+               "nitems":"$nitems",
+               "nic":"$nic",
+                "cost":"$cost",
+                "quantity":"$quantity"
+              },
+  "params" : ["practice","period"],
+  "query": { "sql": "SELECT *,TRIM(name) as name from prescriptions where practice=? AND period=?"}
+},
+
+"practice" : {
+  "template" : {"name":"$name",
+               "add1":"$add1",
+               "add2":"$add2",
+               "town":"$town",
+               "county":"$county",
+                "postcode":"$postcode"},
+  "params" : ["practice"],
+  "query": { "sql": "SELECT TRIM(name) as name, TRIM(add1) as add1, TRIM(add2) as add2, TRIM(town) as town, TRIM(county) as county, TRIM(postcode) as postcode from practices where code=?"}
+}
+
+}
