@@ -29,11 +29,11 @@ for year in range(2017,2012,-1):
 		r = fetch_url(url,fname)
 		if r == False:
 			url = "http://datagov.ic.nhs.uk/presentation/{0:4d}_{1:02d}_{2:s}/T{0:4d}{1:02d}ADDR+BNFT.CSV".format(year,month,months[month-1].lower())
-			#print("Downloading alternative " + url)
+			print("Downloading alternative " + url)
 			r = fetch_url(url,fname)
 			if r == False:
 				url = "http://datagov.ic.nhs.uk/presentation/{0:4d}_{1:02d}_{2:s}/T{0:4d}{1:02d}ADDR+BNFT.csv".format(year,month,months[month-1])
-				#print("Downloading alternative " + url)
+				print("Downloading alternative " + url)
 				r = fetch_url(url,fname)
 				if r == False:
 					print("Not Available")
