@@ -4,6 +4,8 @@ import urllib
 import os
 from pprint import pprint
 
+fromyear = 2016
+toyear = 2017
 months = ['January','February','March','April','May','June','July',
           'August','September','October','November','December']
 
@@ -22,7 +24,7 @@ def fetch_url(url,fname):
 		return False
 	return True
 
-for year in range(2017,2012,-1):
+for year in range(toyear,fromyear,-1):
 	for month in range(12,0,-1):
 		url = "http://datagov.ic.nhs.uk/presentation/{0:4d}_{1:02d}_{2:s}/T{0:4d}{1:02d}PDPI+BNFT.CSV".format(year,month,months[month-1])
 		print("Downloading " + url)

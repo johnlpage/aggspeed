@@ -3,6 +3,9 @@ import urllib
 import os.path
 from pprint import pprint
 
+fromyear = 2016
+toyear = 2017
+
 def fetch_url(url,fname):
 	if os.path.isfile(fname) == False:
 			try:
@@ -23,7 +26,7 @@ months = ['January','February','March','April','May','June','July',
           'August','September','October','November','December']
 short=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
 
-for year in range(2017,2012,-1):
+for year in range(toyear,fromyear,-1):
 	for month in range(12,0,-1):
 		url = "http://digital.nhs.uk/media/33804/Patients-Registered-at-a-GP-Practice-{0:s}-{1:4d}-Totals-GP-practice-all-persons-/default/gp-reg-pat-prac-all-{2:s}-{3:2d}".format(months[month-1],year,short[month-1],year-2000)
 		print(url)
