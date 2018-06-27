@@ -26,13 +26,13 @@ tests = [
 """select practice,sum(cost) as totalspend from prescriptions 
  group by practice
   order by totalspend desc 
-  limit 5;""",
+  limit 10;""",
 """select practice,sum(cost/numpatients) as totalspend,avg(numpatients)
  from prescriptions,patientcounts 
  where prescriptions.practice=patientcounts.code
    group by practice 
    order by totalspend 
-   desc limit 5;""",
+   desc limit 10;""",
 """select county,sum(totalcost) as spend,sum(patients) as patients,sum(totalcost)/sum(patients) as costperpatient
 from
 (select county,sum(cost) as totalcost, avg(numpatients) as patients
