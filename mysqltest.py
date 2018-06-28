@@ -42,7 +42,7 @@ from
   group by county,practice) as byprac
   group by county
   having patients > 100000
-  order by costperpatient desc;
+  order by costperpatient desc limit 20;
 """,
 """
 select bnfcode,max(name),sum(nitems) as items 
@@ -52,10 +52,10 @@ order by items desc
 limit 10;
 """,
 """
-select bnfcode,max(name),sum(cost) as cost 
+select bnfcode,max(name),sum(cost) as totalcost 
 from prescriptions
 group by bnfcode
-order by items desc
+order by totalcost desc
 limit 10;
 """,
 """
